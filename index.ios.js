@@ -16,6 +16,7 @@ var MOCKED_MOVIES_DATA = [
 var {
   AppRegistry,
   Image,
+  ListView,
   StyleSheet,
   Text,
   View,
@@ -26,7 +27,10 @@ var BestTodoChain = React.createClass({
 
   getInitialState: function() {
     return {
-      movies: null,
+      dataSource: new ListView.DataSource({
+        rowHasChanged: (row1, row2) => row1 !== row2,
+      }),
+      loaded: false,
     };
   },
 
@@ -34,25 +38,31 @@ var BestTodoChain = React.createClass({
       this.fetchData();
   },
 
-      fetchData: function() {
-        fetch(REQUEST_URL)
-          .then((response) => response.json())
-          .then((responseData) => {
-            this.setState({
-              movies: responseData.movies,
-            });
-          })
-          .done();
-      },
+  fetchData: function() {
+    fetch(REQUEST_URL)
+      .then((response) => response.json())
+      .then((responseData) => {
+        this.setState({
+          dataSource: this.state.dataSource.cloneWithRows(responseData.movies),
+          loaded: true,
+        });
+      })
+      .done();
+  },
 
   render: function() {
-      if (!this.state.movies) {
-        return this.renderLoadingView();
-      }
+    if (!this.state.loaded) {
+      return this.renderLoadingView();
+    }
 
-      var movie = this.state.movies[0];
-      return this.renderMovie(movie);
-    },
+    return (
+      <ListView
+        dataSource={this.state.dataSource}
+        renderRow={this.renderMovie}
+        style={styles.listView}
+      />
+    );
+  },
 
     renderLoadingView: function() {
       return (
@@ -107,6 +117,10 @@ var styles = StyleSheet.create({
   thumbnail: {
     width: 53,
     height: 81,
+  },
+  listView: {
+    paddingTop: 20,
+    backgroundColor: '#F5FCFF',
   },
 });
 
