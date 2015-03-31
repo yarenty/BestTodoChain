@@ -6,6 +6,7 @@ var {
   ListView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } = React;
 
@@ -62,17 +63,34 @@ var BestTodoChain = React.createClass({
       .done();
   },
 
+  handleSubmit: function(e) {
+    e.preventDefault();
+    var nextItems = this.state.items.concat([this.state.text]);
+    var nextText = '';
+    this.setState({items: nextItems, text: nextText});
+  },
+
+
+
   render: function() {
     if (!this.state.loaded) {
       return this.renderLoadingView();
     }
 
     return (
+    <View >
+
       <ListView
         dataSource={this.state.dataSource}
         renderRow={this.renderMovie}
         style={styles.listView}
       />
+        <TextInput
+          style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+          onChangeText={(text) => this.setState({input: text})}
+        />
+        <Text style={styles.outtext}>{'user input: ' + this.state.input}</Text>
+      </View>
     );
   },
 
@@ -80,7 +98,7 @@ var BestTodoChain = React.createClass({
     return (
       <View style={styles.container}>
         <Text>
-          Loading movies...
+          Connecting to rememome...
         </Text>
       </View>
     );
@@ -98,6 +116,7 @@ var BestTodoChain = React.createClass({
           <Text style={styles.year}>{movie.year}</Text>
         </View>
       </View>
+
     );
   },
 });
@@ -120,6 +139,10 @@ var styles = StyleSheet.create({
   },
   year: {
     textAlign: 'center',
+  },
+  outtext: {
+      textAlign: 'center',
+      backgroundColor: '#F5FCFF',
   },
   thumbnail: {
     width: 53,
